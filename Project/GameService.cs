@@ -7,7 +7,8 @@ namespace CastleGrimtol.Project
 {
   public class GameService : IGameService
   {
-    public Room CurrentRoom { get; set; }
+    public Room currentRoom { get; set; }
+    public Room startLocation { get; set; }
     public Player CurrentPlayer { get; set; }
     private bool running = true;
 
@@ -16,7 +17,7 @@ namespace CastleGrimtol.Project
     public void GetUserInput()
     {
       string input = Console.ReadLine().ToLower();
-      string[] inputs = input.Split(' ');
+      string[] inputs = input.Split(' '); //tokenize the string 
       string command = inputs[0];
       string option = "";
       if (inputs.Length > 1)
@@ -32,12 +33,16 @@ namespace CastleGrimtol.Project
           TakeItem(option);
           break;
         case "use":
-        case "break":
         case "place":
+          UseItem(option);
+          break;
+        case "break":
         case "open":
         case "swing":
         case "platform":
         case "look":
+          Look();
+          break;
         case "inventory":
         case "help":
         case "quit":
@@ -50,7 +55,15 @@ namespace CastleGrimtol.Project
 
     public void Go(string direction)
     {
-      CurrentRoom = (Room)CurrentRoom.Go(direction);
+      Room destination = (Room)currentRoom.Go(direction);
+      if (destination == null)
+      {
+        KillLoser();
+      }
+      else
+      {
+        currentRoom = destination;
+      }
     }
 
     public void Help()
@@ -65,7 +78,7 @@ namespace CastleGrimtol.Project
 
     public void Look()
     {
-      Console.WriteLine($"{CurrentRoom.Description}");
+      Console.WriteLine($"{currentRoom.Description}");
     }
 
     public void Quit()
@@ -111,16 +124,39 @@ namespace CastleGrimtol.Project
       Item ropeBridge = new Item("Bridge", "A rickety rope bridge. It does not look stable.");
       Item sconce = new Item("Sconce", "A metal sconce. It looks like a torch would fit into it.");
       Item pedestal = new Item("Pedestal", "A light shines on the pedestal. The effect is striking. You're speechless.");
+      Item DEM = new Item("DEM", "Limitless Power!!!!");
       #endregion
 
       #region relationships
-      entry.AddRoom("north", bridge);
-      bridge.AddRoom("south", entry);
-      bridge.AddRoom("north", tower);
-      tower.AddRoom("south", bridge);
-      tower.AddRoom("down", treasure);
+      entry.AddExit("north", (string direction) => bridge);
+      bridge.AddExit("south", (string direction) => entry);
+      bridge.AddExit("north", (string direction) =>
+      {
+        if (bridge.Items.Contains(DEM))
+        {
+          return tower;
+        }
+        else
+        {
+          bridge.DeathScene = "Rickety bridges are an embarrassing data type conversion. You plummet to your death. But not immediate death. It's prolongued and excruciating.";
+          return null;
+        }
+      });
+      bridge.AddUsableItem(DEM, (Item itemToUse) =>
+      {
+        bridge.AddItem(itemToUse);
+        return "";
+      });
+      tower.AddUsableItem(torch, (Item itemToUse) =>
+      {
+        tower.AddItem(itemToUse);
+        return "";
+      });
+      tower.AddExit("south", (string direction) => bridge);
+      tower.AddExit("down", (string direction) => treasure);
       entry.AddItem(grappling);
       entry.AddItem(torch);
+      entry.AddItem(DEM);
       entry.AddItem(paperweight);
       entry.AddItem(sconce);
       bridge.AddItem(ropeBridge);
@@ -130,23 +166,24 @@ namespace CastleGrimtol.Project
       treasure.AddItem(pedestal);
       #endregion
 
-      CurrentRoom = entry;
+      startLocation = entry;
 
     }
 
     public void StartGame()
     {
-      Console.Clear();
+      // Console.Clear();
       System.Console.WriteLine("Welcome to your adventure. What is your name?");
       string name = Console.ReadLine();
       CurrentPlayer = new Player(name);
+      currentRoom = startLocation;
       System.Console.WriteLine($"Thank you, '{name}'. However, you and I both know that you're ACTUALLY {name} Drake, long-lost descendant of Sir Francis Drake, wily adventurer, and you're ready to make your namesake proud. \r\nYou have killed A LOT of nameless mercenaries to get here on your quest for the statue of El Dorado. You stand in front of a non-descript wooden door. \nIt has markings that match drawings from your ancestor's diary, and you're pretty sure this is the spot. Do you enter? y/n: ");
       string choice = Console.ReadLine().ToLower();
       if (choice == "y")
       {
         while (running)
         {
-          CurrentRoom.Print();
+          currentRoom.Print();
           GetUserInput();
         }
       }
@@ -160,18 +197,31 @@ namespace CastleGrimtol.Project
 
     public void TakeItem(string itemName)
     {
-      Item itemTaken = CurrentRoom.TakeItem(itemName);
+      Item itemTaken = currentRoom.TakeItem(new Item(itemName, ""));
       if (itemTaken != null)
       {
         CurrentPlayer.Inventory.Add(itemTaken);
-        System.Console.WriteLine($"You have added {itemName} to your inventory. {itemTaken.Description}");
+        System.Console.WriteLine($"You have added {itemTaken.Name} to your inventory. {itemTaken.Description}");
       }
-
+    }
+    public void KillLoser()
+    {
+      string obit = currentRoom.DeathScene;
+      System.Console.WriteLine(obit);
+      Quit();
     }
 
     public void UseItem(string itemName)
     {
-      throw new System.NotImplementedException();
+      Item itemToUse = new Item(itemName, "");
+      if (CurrentPlayer.Inventory.Contains(itemToUse))
+      {
+        currentRoom.UseItem(itemToUse);
+      }
+      else
+      {
+        System.Console.WriteLine($"You don't seem to have {itemName} in your inventory. Perhaps you should remedy that?");
+      }
     }
 
     public GameService()

@@ -22,7 +22,7 @@
     -  In the while(playing) loop, prompt the user for input and take in user input
     - Evaluate that input on a switch to determine what action to run
       <!-- -  Go: runs the method you created to move from room to room -->
-      - Take: attempts to move an item from the room list into the player inventory
+      <!-- - Take: attempts to move an item from the room list into the player inventory -->
       - Use: You will need to write a method on how to handle using the item
       - Look: run the look method
       - Help: run the health method
