@@ -1,27 +1,26 @@
 using System;
 using System.Collections.Generic;
-using CastleGrimtol.Project.Interfaces;
+using Uncharted.Project.Interfaces;
 
-namespace CastleGrimtol.Project.Models
+namespace Uncharted.Project.Models
 {
   public class Room : IRoom
   {
     public string Name { get; set; }
     public string Description { get; set; }
-    public string DeathScene { get; set; }
+    // public string DeathScene { get; set; }
     public List<Item> Items { get; set; }
-    public Dictionary<Item, Func<Item, string>> UsableItems { get; set; }
-    public Dictionary<string, Func<string, IRoom>> exits { get; set; }
+    // public Dictionary<Item, Func<Item, string>> UsableItems { get; set; }
+    public Dictionary<string, IRoom> Exits { get; set; }
 
-
-    public void AddExit(string direction, Func<string, IRoom> fn)
-    {
-      exits.Add(direction, fn);
-    }
-    public void AddUsableItem(Item usableItem, Func<Item, string> fn)
-    {
-      UsableItems.Add(usableItem, fn);
-    }
+    // public void AddExit(string direction, Func<string, IRoom> fn)
+    // {
+    //   Exits.Add(direction, fn);
+    // }
+    // public void AddUsableItem(Item usableItem, Func<Item, string> fn)
+    // {
+    //   UsableItems.Add(usableItem, fn);
+    // }
 
     public void AddItem(Item item)
     {
@@ -30,15 +29,15 @@ namespace CastleGrimtol.Project.Models
 
     public IRoom Go(string direction)
     {
-      if (exits.ContainsKey(direction))
+      if (Exits.ContainsKey(direction))
       {
-        return exits[direction](direction);
+        return Exits[direction];
       }
       Console.WriteLine("You can't go that way.");
       return this;
     }
 
-    public Item TakeItem(Item item)
+    public Item TakeItem(Item item) //see if this works
     {
       System.Console.WriteLine($"Searching in {Name} for {item.Name}");
       Item foundItem = Items.Find((Item i) =>
@@ -59,19 +58,25 @@ namespace CastleGrimtol.Project.Models
       }
     }
 
-    public void UseItem(Item itemToUse)
+    public void UseItem(string itemToUse)
     {
-
-      foreach (var item in UsableItems.Keys)
+      System.Console.WriteLine($"You have used the {itemToUse} in the {Name} room.");
+      if (Name == "treasure" && itemToUse == "torch")
       {
+        Description = @"The room is lit well, due to your torch. You see a pedestal in the middle of the room
+            On the pedestal is a glimmering golden statue. It's El Dorado! The journal was right!";
+      }
+      // Item usingItem =
+      // foreach (var item in UsableItems.Keys)
+      //   {
 
-        System.Console.WriteLine(item.ToString());
-      }
-      if (UsableItems.ContainsKey(itemToUse))
-      {
-        UsableItems[itemToUse](itemToUse);
-      }
-      System.Console.WriteLine("I don't think that will work here.");
+      //     System.Console.WriteLine(item.ToString());
+      //   }
+      //   if (UsableItems.ContainsKey(itemToUse))
+      //   {
+      //     UsableItems[itemToUse](itemToUse);
+      //   }
+      //   System.Console.WriteLine("I don't think that will work here.");
     }
 
 
@@ -81,7 +86,6 @@ namespace CastleGrimtol.Project.Models
     {
       Console.WriteLine($"You are in {Name}. {Description}");
       Console.WriteLine("What would you like to do?");
-
     }
 
 
@@ -89,8 +93,8 @@ namespace CastleGrimtol.Project.Models
     {
       Name = name;
       Description = description;
-      exits = new Dictionary<string, Func<string, IRoom>>();
-      UsableItems = new Dictionary<Item, Func<Item, string>>();
+      Exits = new Dictionary<string, IRoom>();
+      // UsableItems = new Dictionary<Item, Func<Item, string>>();
       Items = new List<Item>();
     }
   }

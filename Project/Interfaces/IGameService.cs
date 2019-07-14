@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using CastleGrimtol.Project.Models;
+using Uncharted.Project.Models;
 
-namespace CastleGrimtol.Project.Interfaces
+namespace Uncharted.Project.Interfaces
 {
   public interface IGameService
   {
-    Room currentRoom { get; set; }
+    Room CurrentRoom { get; set; }
     Player CurrentPlayer { get; set; }
 
     //Initializes the game, creates rooms, their exits, and add items to rooms

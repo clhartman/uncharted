@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using CastleGrimtol.Project.Interfaces;
+using Uncharted.Project.Interfaces;
 
-namespace CastleGrimtol.Project.Models
+namespace Uncharted.Project.Models
 {
-  public class Item : IItem, IEquatable<Item>, IComparer<Item>
+  public class Item : IItem
   {
     public string Name { get; set; }
     public string Description { get; set; }
@@ -17,38 +17,38 @@ namespace CastleGrimtol.Project.Models
       Description = description;
     }
 
-    public bool Equals(Item other)
-    {
+    // public bool Equals(Item other)
+    // {
 
-      // System.Console.WriteLine($"ITEM - Equals - {this.ToString()} & { other.ToString() }");
+    //   // System.Console.WriteLine($"ITEM - Equals - {this.ToString()} & { other.ToString() }");
 
-      System.Console.WriteLine($"ITEM - Equals to lower - this.Name {this.Name.ToLower()} & { other.Name.ToLower() }");
-      System.Console.WriteLine($"ITEM - Equals == {this.Name.ToLower().Equals(other.Name.ToLower()) }");
-      return this.Name.ToLower().Equals(other.Name.ToLower());
-    }
+    //   System.Console.WriteLine($"ITEM - Equals to lower - this.Name {this.Name.ToLower()} & { other.Name.ToLower() }");
+    //   System.Console.WriteLine($"ITEM - Equals == {this.Name.ToLower().Equals(other.Name.ToLower()) }");
+    //   return this.Name.ToLower().Equals(other.Name.ToLower());
+    // }
 
-    public override bool Equals(Object obj)
-    {
+    // public override bool Equals(Object obj)
+    // {
 
-      // System.Console.WriteLine($"ITEM - override Equals - {this.ToString()} & { ((Item)obj).ToString() }");
-      return this.Equals((Item)obj);
-    }
+    //   // System.Console.WriteLine($"ITEM - override Equals - {this.ToString()} & { ((Item)obj).ToString() }");
+    //   return this.Equals((Item)obj);
+    // }
 
-    public override string ToString()
-    {
-      return $"Item -> Name: {Name}, Description: {Description}";
-    }
+    // public override string ToString()
+    // {
+    //   return $"Item -> Name: {Name}, Description: {Description}";
+    // }
 
-    public override int GetHashCode()
-    {
-      return Name.GetHashCode();
-    }
+    // public override int GetHashCode()
+    // {
+    //   return Name.GetHashCode();
+    // }
 
-    public int Compare(Item x, Item y)
-    {
-      System.Console.WriteLine($"ITEM - Compare to lower - this.Name {x.Name.ToLower()} & { y.Name.ToLower() }");
-      System.Console.WriteLine($"ITEM - Compare - compareto {x.Name.ToLower().CompareTo(y.Name.ToLower()) }");
-      return x.Name.ToLower().CompareTo(y.Name.ToLower());
-    }
+    // public int Compare(Item x, Item y)
+    // {
+    //   System.Console.WriteLine($"ITEM - Compare to lower - this.Name {x.Name.ToLower()} & { y.Name.ToLower() }");
+    //   System.Console.WriteLine($"ITEM - Compare - compareto {x.Name.ToLower().CompareTo(y.Name.ToLower()) }");
+    //   return x.Name.ToLower().CompareTo(y.Name.ToLower());
+    // }
   }
 }

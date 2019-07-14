@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CastleGrimtol.Project.Interfaces;
+using Uncharted.Project.Interfaces;
 
-namespace CastleGrimtol.Project.Models
+namespace Uncharted.Project.Models
 {
   public class Player : IPlayer
   {

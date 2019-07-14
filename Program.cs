@@ -1,7 +1,7 @@
 ﻿using System;
-using CastleGrimtol.Project;
+using Uncharted.Project;
 
-namespace CastleGrimtol
+namespace Uncharted
 {
   public class Program
   {
