@@ -220,6 +220,15 @@ namespace Uncharted.Project
         if (choice == "y")
         {
           Console.Clear();
+          System.Console.WriteLine(@"At any time, type 
+          'go' to move in a specific direction
+          'take' to take something from the room
+          'use' to use an item that is in your inventory
+          'help' to see your options 
+          'inventory' to see what you currently have in your inventory
+          'quit' to end the game");
+          Thread.Sleep(8000);
+          Console.Clear();
           CurrentRoom.Print();
           while (Running)
           {
