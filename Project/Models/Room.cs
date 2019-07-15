@@ -8,19 +8,8 @@ namespace Uncharted.Project.Models
   {
     public string Name { get; set; }
     public string Description { get; set; }
-    // public string DeathScene { get; set; }
     public List<Item> Items { get; set; }
-    // public Dictionary<Item, Func<Item, string>> UsableItems { get; set; }
     public Dictionary<string, IRoom> Exits { get; set; }
-
-    // public void AddExit(string direction, Func<string, IRoom> fn)
-    // {
-    //   Exits.Add(direction, fn);
-    // }
-    // public void AddUsableItem(Item usableItem, Func<Item, string> fn)
-    // {
-    //   UsableItems.Add(usableItem, fn);
-    // }
 
     public void AddItem(Item item)
     {
@@ -64,8 +53,27 @@ namespace Uncharted.Project.Models
       if (Name == "treasure" && itemToUse == "torch")
       {
         Description = @"The room is lit well, due to your torch. You see a pedestal in the middle of the room
-            On the pedestal is a glimmering golden statue. It's El Dorado! The journal was right!";
+            On the pedestal is a glimmering golden statue. It's El Dorado! The journal was right! What do you do?";
       }
+      else if (Name == "bridge" && itemToUse == "torch")
+      {
+        Description = @"It's a room with a rickety rope bridge over a deep chasm. 
+        The bridge does not look particularly safe, but you don't see any other options.
+        Over the bridge, to the north, is an open archway. What do you do?";
+      }
+      else if (Name == "tower" && itemToUse == "hook")
+      {
+        System.Console.WriteLine(@"You swing the hook and rope combo in a circular motion.
+        You let the hook fly up towards the ring in the ceiling, and it connects!
+        You hold onto the rope, and swing out over the chasm, and the hook stays firmly in place.
+        The only way to go is down.
+        What do you do?");
+      }
+      else
+      {
+        System.Console.WriteLine("I don't think that will work here.");
+      }
+      System.Console.WriteLine(Description);
       // Item usingItem =
       // foreach (var item in UsableItems.Keys)
       //   {
@@ -76,15 +84,24 @@ namespace Uncharted.Project.Models
       //   {
       //     UsableItems[itemToUse](itemToUse);
       //   }
-      //   System.Console.WriteLine("I don't think that will work here.");
     }
+
+    // public void TowerDrop()
+    // {
+    //   Item hookCheck = Items.Find(item => item.Name.ToLower() == "hook");
+    //   if (Items.Contains(Item hook))
+    //   {
+    //     System.Console.WriteLine("You make your way slowly down the rope");
+    //   }
+    //   System.Console.WriteLine("You're in the tower drop function");
+    // }
 
 
 
 
     public void Print()
     {
-      Console.WriteLine($"You are in {Name}. {Description}");
+      Console.WriteLine($"You are in a room. {Description}");
       Console.WriteLine("What would you like to do?");
     }
 

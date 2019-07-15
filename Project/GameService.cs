@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Uncharted.Project.Interfaces;
 using Uncharted.Project.Models;
 
@@ -47,6 +48,8 @@ namespace Uncharted.Project
           Inventory();
           break;
         case "help":
+          Help();
+          break;
         case "quit":
           Quit();
           break;
@@ -57,27 +60,41 @@ namespace Uncharted.Project
 
     public void Go(string direction)
     {
+      Console.Clear();
       Room destination = (Room)CurrentRoom.Go(direction);
-      // if (destination == null)
+      // if (CurrentRoom.Name == "tower" && direction == "down")
       // {
-      //   KillLoser();
+      //   CurrentRoom.TowerDrop();
       // }
       // else
-      // {
-      CurrentRoom = destination;
-      // }
+      {
+        CurrentRoom = destination;
+        CurrentRoom.Print();
+      }
     }
 
     public void Help()
     {
-      throw new System.NotImplementedException();
+      Console.Clear();
+      System.Console.WriteLine(@"Choices:
+      'go' : choose a direction to move
+      'take' : to take an item from the room
+      'use' : to use the item in your inventory
+      'look' : to remind you about the room you're currently in
+      'help' : for instructions on what you can do
+      'inventory' : to see what items are currently in your inventory
+      'quit' : to end the current game");
     }
 
     public void Inventory()
     {
       foreach (var item in CurrentPlayer.Inventory)
       {
-        System.Console.WriteLine(item.Name);
+        System.Console.WriteLine($"{item.Name} is in your inventory");
+      }
+      if (CurrentPlayer.Inventory.Count == 0)
+      {
+        System.Console.WriteLine("Your inventory is empty.");
       }
     }
 
@@ -100,6 +117,10 @@ namespace Uncharted.Project
       if (response == "n")
       {
         Running = false;
+        System.Console.WriteLine("Thank you for playing!");
+        Thread.Sleep(2000);
+        Console.Clear();
+        Environment.Exit(0);
       }
       else
       {
@@ -110,27 +131,30 @@ namespace Uncharted.Project
 
     public void Reset()
     {
+      Setup();
       StartGame();
     }
 
     public void Setup()
     {
       #region rooms
-      Room entry = new Room("entry", "A wide, square room");
-      Room bridge = new Room("bridge", "A room with a rickety rope bridge over a deep chasm");
-      Room tower = new Room("tower", "A circular room.");
+      Room entry = new Room("entry", @"It's a wide, square room, with a lit torch resting comfortably in a sconce next to you. 
+      To the north is a door.");
+      Room bridge = new Room("bridge", @"It's a room - you're guessing. 
+      You can't see anything, because it's dark.
+      You know the entry room is still to the south, but beyond that, you're essentially blind.");
+      Room tower = new Room("tower", @"You are in a circular room, with a set of winding stairs leading down.");
       Room treasure = new Room("treasure", "A murky basement room. You see nothing, because it's dark.");
       #endregion
 
       #region items
-      Item grappling = new Item("hook", "It is a metal hook attached to a long rope");
+      Item grappling = new Item("hook", "It is a metal hook attached to a long rope.");
       Item torch = new Item("torch", "It's a torch. It casts light so you can see.");
       Item paperweight = new Item("paperweight", "It's a paperweight. It looks like it's made of glass, but it's quite heavy and is essentially worthless");
       Item goldStatue = new Item("statue", "It's a golden statue of El Dorado. It's large and heavy and it's amazing that you can lift it. It is decidedly NOT worthless");
       Item ropeBridge = new Item("bridge", "A rickety rope bridge. It does not look stable.");
       Item sconce = new Item("sconce", "A metal sconce. It looks like a torch would fit into it.");
       Item pedestal = new Item("pedestal", "A light shines on the pedestal. The effect is striking. You're speechless.");
-      Item DEM = new Item("DEM", "Limitless Power!!!!");
       #endregion
 
       #region relationships
@@ -163,7 +187,6 @@ namespace Uncharted.Project
       tower.Exits.Add("down", treasure);
       entry.AddItem(grappling);
       entry.AddItem(torch);
-      entry.AddItem(DEM);
       entry.AddItem(paperweight);
       entry.AddItem(sconce);
       bridge.AddItem(ropeBridge);
@@ -179,29 +202,39 @@ namespace Uncharted.Project
 
     public void StartGame()
     {
-      // Console.Clear();
+      Console.Clear();
       System.Console.WriteLine("Welcome to your adventure. What is your name?");
       string name = Console.ReadLine();
       CurrentPlayer = new Player(name);
       CurrentRoom = StartLocation;
-      System.Console.WriteLine($"Thank you, '{name}'. However, you and I both know that you're ACTUALLY {name} Drake, long-lost descendant of Sir Francis Drake, wily adventurer, and you're ready to make your namesake proud. \r\nYou have killed A LOT of nameless mercenaries to get here on your quest for the statue of El Dorado. You stand in front of a non-descript wooden door. \nIt has markings that match drawings from your ancestor's diary, and you're pretty sure this is the spot. Do you enter? y/n: ");
-      string choice = Console.ReadLine().ToLower();
-      if (choice == "y")
+      Console.Clear();
+      System.Console.WriteLine($@"Thank you, '{name}'. 
+      However, you and I both know that you're ACTUALLY Nathan Drake, long-lost descendant of Sir Francis Drake,
+      wily adventurer, and you're ready to make your namesake proud.
+      You have killed A LOT of nameless mercenaries to get here on your quest for the statue of El Dorado. 
+      You stand in front of a non-descript wooden door. 
+      It has markings that match drawings from your ancestor's diary, and you're pretty sure this is the spot. 
+      Do you enter? y/n: ");
       {
-        while (Running)
+        string choice = Console.ReadLine().ToLower();
+        if (choice == "y")
         {
+          Console.Clear();
           CurrentRoom.Print();
-          GetUserInput();
+          while (Running)
+          {
+            GetUserInput();
+          }
         }
+        if (choice == "n")
+        {
+          Console.Clear();
+          Console.WriteLine("An unkilled nameless mercenary was hiding behind a burned-out vehicle. In your moment of indecision, he headshots you.");
+          Quit();
+        }
+        Console.WriteLine("Thanks for playing!");
       }
-      if (choice == "n")
-      {
-        Console.WriteLine("An unkilled nameless mercenary was hiding behind a burned-out vehicle. In your moment of indecision, he headshots you.");
-        Quit();
-      }
-      Console.WriteLine("Thank you for playing!");
     }
-
     public void TakeItem(string itemName)
     {
       Item itemTaken = CurrentRoom.Items.Find(item => item.Name.ToLower() == itemName.ToLower());
@@ -220,31 +253,24 @@ namespace Uncharted.Project
         System.Console.WriteLine("Invalid Option");
       }
     }
-    // public void KillLoser()
-    // {
-    //   string obit = CurrentRoom.DeathScene;
-    //   System.Console.WriteLine(obit);
-    //   Quit();
-    // }
-
     public void UseItem(string itemName)
     {
       Item itemToUse = CurrentPlayer.Inventory.Find(item => item.Name.ToLower() == itemName.ToLower());
       //switch statement which sends to a method for specific item - that item then validates the room
-      // if (CurrentPlayer.Inventory.Contains(itemToUse) && CurrentRoom.Name == "treasure")
+      if (CurrentPlayer.Inventory.Contains(itemToUse))
       {
-        switch (itemName)
+        switch (itemToUse.Name)
         {
           case "torch":
-            CurrentPlayer.Inventory.Remove(itemToUse);
+            // CurrentPlayer.Inventory.Remove(itemToUse);
             CurrentRoom.Items.Add(itemToUse);
-            System.Console.WriteLine(@"The room is lit well, due to your torch. You see a pedestal in the middle of the room
-            On the pedestal is a glimmering golden statue. It's El Dorado! The journal was right!");
             CurrentRoom.UseItem(itemName);
             break;
-          // case "hook":
-          //   CurrentRoom.UseItem(itemToUse);
-          //   break;
+          case "hook":
+            CurrentPlayer.Inventory.Remove(itemToUse);
+            CurrentRoom.Items.Add(itemToUse);
+            CurrentRoom.UseItem(itemName);
+            break;
           // case "paperweight":
           //   CurrentRoom.UseItem(itemToUse);
           //   break;
@@ -252,10 +278,16 @@ namespace Uncharted.Project
           //   CurrentRoom.UseItem(itemToUse);
           //   break;
           default:
-            System.Console.WriteLine($"{itemName} is not a thing that exists here.");
+            System.Console.WriteLine($"{itemName} is not in your inventory.");
             break;
 
         }
+
+
+      }
+      else
+      {
+        System.Console.WriteLine($"{itemName} is not in your inventory");
       }
       // else
       // {
